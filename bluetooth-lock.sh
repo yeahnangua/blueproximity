@@ -44,19 +44,20 @@ if [ "$1" == "--test" ]; then
     TEST="1"
 fi
 
-DETECTED-ON-START=0
+DETECTED_ON_START=0
 
 while true; do
-    sleep 300
+    #sleep 300
     current_date_time=$(date)
     log "Search for device ${BT_DEVICE} @ ${current_date_time}"
     BT_NAME=`hcitool name $BT_DEVICE`
     log "Detected ${BT_NAME}"
-    if [ DETECTED-ON-START == 0 ]; then
+    if [ ${DETECTED_ON_START} == 0 ]; then
         if [ "" == "${BT_NAME}" ]; then
             log "not detect on start"
+            sleep 10
         else
-            DETECTED-ON-START=1
+            DETECTED_ON_START=1
         fi
     else
         log "detect on start"
@@ -78,4 +79,5 @@ while true; do
             fi
         fi
     sleep 10
+    fi
 done
