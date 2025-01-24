@@ -44,27 +44,38 @@ if [ "$1" == "--test" ]; then
     TEST="1"
 fi
 
+DETECTED-ON-START=0
+
 while true; do
+    sleep 300
     current_date_time=$(date)
     log "Search for device ${BT_DEVICE} @ ${current_date_time}"
     BT_NAME=`hcitool name $BT_DEVICE`
     log "Detected ${BT_NAME}"
-    # Prüfen, ob das Gerät in der Nähe ist
-    if [ "" == "${BT_NAME}" ]; then
-        # Wenn das Gerät nicht gefunden wurde, Benutzer abmelden
-        log "lock session"
-        if [ "${TEST}" == "0" ]; then
-            loginctl lock-session
+    if [ DETECTED-ON-START == 0 ]; then
+        if [ "" == "${BT_NAME}" ]; then
+            log "not detect on start"
         else
-            log "(locking prevented as TEST is ${TEST})"
+            DETECTED-ON-START=1
         fi
     else
-        log "device present - unlock session"
-        if [ "${TEST}" == "0" ]; then
-            loginctl unlock-session
+        log "detect on start"
+        # Prüfen, ob das Gerät in der Nähe ist
+        if [ "" == "${BT_NAME}" ]; then
+            # Wenn das Gerät nicht gefunden wurde, Benutzer abmelden
+            log "lock session"
+            if [ "${TEST}" == "0" ]; then
+                loginctl lock-session
+            else
+                log "(locking prevented as TEST is ${TEST})"
+            fi
         else
-            log "(unlocking prevented as TEST is ${TEST})"
+            log "device present - unlock session"
+            if [ "${TEST}" == "0" ]; then
+                loginctl unlock-session
+            else
+                log "(unlocking prevented as TEST is ${TEST})"
+            fi
         fi
-    fi
     sleep 10
 done
